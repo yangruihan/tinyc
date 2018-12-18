@@ -1,28 +1,46 @@
+FUNC @main:
 var a, b, c, d
 
-push 1
 push 2
-push 2
-push 2
-add
-mul
-add
-pop a
-
-push 5
 pop c
 
-push 10
+push c
+push 2
+mul
 pop d
 
 push c
 push d
-add
+$sum
+pop a
+
+push a
+push d
+$sum
 pop b
+
+push c
+push d
+print "c = %d, d = %d"
 
 push a
 push b
-push c
-push d
-print "a = %d, b = %d, c = %d, d = %d"
+print "a = sum(c, d) = %d, b = sum(a, d) = %d"
+
+push 0
+ret ~
+
+ENDFUNC
+
+FUNC @sum:
+arg a, b
+
+var c, d
+
+push a
+push b
+add
+ret ~
+
+ENDFUNC
 

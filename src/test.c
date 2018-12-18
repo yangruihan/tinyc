@@ -1,7 +1,20 @@
-int a, b, c, d;
-a = 1 + 2 * ( 2 + 2 );
-c = 5;
-d = 10;
-b = c + d;
+// tinyc test file
+int main() {
+    int a, b, c, d;
 
-print("a = %d, b = %d, c = %d, d = %d", a, b, c, d);
+    c = 2;
+    d = c * 2;
+
+    a = sum(c, d);
+    b = sum(a, d);
+    print("c = %d, d = %d", c, d);
+    print("a = sum(c, d) = %d, b = sum(a, d) = %d", a, b);
+
+    return 0;
+}
+
+int sum(int a, int b) {
+    int c, d;
+    return a + b;
+}
+
