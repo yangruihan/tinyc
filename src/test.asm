@@ -1,46 +1,78 @@
 FUNC @main:
-var a, b, c, d
+	var i
 
-push 2
-pop c
+	push 0
+	pop i
 
-push c
-push 2
-mul
-pop d
+_begWhile_1:
+	push i
+	push 10
+	cmplt
+	jz _endWhile_1
+	push i
+	push 1
+	add
+	pop i
 
-push c
-push d
-$sum
-pop a
+_begIf_1:
+	push i
+	push 3
+	cmpeq
+	push i
+	push 5
+	cmpeq
+	or
+	jz _elIf_1
+	jmp _begWhile_1
+	jmp_endIf_1
+_elIf_1:
+_endIf_1:
 
-push a
-push d
-$sum
-pop b
+_begIf_2:
+	push i
+	push 8
+	cmpeq
+	jz _elIf_2
+	jmp _endWhile_1
+	jmp_endIf_2
+_elIf_2:
+_endIf_2:
 
-push c
-push d
-print "c = %d, d = %d"
+	push i
+	push i
+	$factor
+	print "%d! = %d"
 
-push a
-push b
-print "a = sum(c, d) = %d, b = sum(a, d) = %d"
+	jmp _begWhile_1
+_endWhile_1:
 
-push 0
-ret ~
+	push 0
+	ret ~
 
 ENDFUNC
 
-FUNC @sum:
-arg a, b
+FUNC @factor:
+	arg n
 
-var c, d
+_begIf_3:
+	push n
+	push 2
+	cmplt
+	jz _elIf_3
+	push 1
+	ret ~
 
-push a
-push b
-add
-ret ~
+	jmp_endIf_3
+_elIf_3:
+_endIf_3:
+
+	push n
+	push n
+	push 1
+	sub
+	$factor
+	mul
+	ret ~
 
 ENDFUNC
 

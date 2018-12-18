@@ -1,20 +1,24 @@
-// tinyc test file
+#include "for_gcc_build.hh" // only for gcc, TinyC will ignore it.
+
 int main() {
-    int a, b, c, d;
-
-    c = 2;
-    d = c * 2;
-
-    a = sum(c, d);
-    b = sum(a, d);
-    print("c = %d, d = %d", c, d);
-    print("a = sum(c, d) = %d, b = sum(a, d) = %d", a, b);
-
+    int i;
+    i = 0;
+    while (i < 10) {
+        i = i + 1;        
+        if (i == 3 || i == 5) {
+            continue;
+        }        
+        if (i == 8) {
+            break;
+        }
+        print("%d! = %d", i, factor(i));
+    }
     return 0;
 }
 
-int sum(int a, int b) {
-    int c, d;
-    return a + b;
+int factor(int n) {
+    if (n < 2) {
+        return 1;
+    }
+    return n * factor(n - 1);
 }
-

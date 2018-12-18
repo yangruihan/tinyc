@@ -49,10 +49,21 @@ extern int yydebug;
     T_Void = 259,
     T_Return = 260,
     T_Print = 261,
-    T_IntConstant = 262,
-    T_StringConstant = 263,
-    T_Identifier = 264,
-    U_neg = 265
+    T_ReadInt = 262,
+    T_While = 263,
+    T_If = 264,
+    T_Else = 265,
+    T_Break = 266,
+    T_Continue = 267,
+    T_Le = 268,
+    T_Ge = 269,
+    T_Eq = 270,
+    T_Ne = 271,
+    T_And = 272,
+    T_Or = 273,
+    T_IntConstant = 274,
+    T_StringConstant = 275,
+    T_Identifier = 276
   };
 #endif
 /* Tokens.  */
@@ -60,10 +71,21 @@ extern int yydebug;
 #define T_Void 259
 #define T_Return 260
 #define T_Print 261
-#define T_IntConstant 262
-#define T_StringConstant 263
-#define T_Identifier 264
-#define U_neg 265
+#define T_ReadInt 262
+#define T_While 263
+#define T_If 264
+#define T_Else 265
+#define T_Break 266
+#define T_Continue 267
+#define T_Le 268
+#define T_Ge 269
+#define T_Eq 270
+#define T_Ne 271
+#define T_And 272
+#define T_Or 273
+#define T_IntConstant 274
+#define T_StringConstant 275
+#define T_Identifier 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
