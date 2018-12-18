@@ -1,0 +1,465 @@
+Grammar
+
+    0 $accept: S $end
+
+    1 S: Stmt
+    2  | S Stmt
+
+    3 Stmt: VarDecl ';'
+    4     | Assign
+    5     | Print
+
+    6 VarDecl: T_Int T_Identifier
+    7        | VarDecl ',' T_Identifier
+
+    8 Assign: T_Identifier '=' E ';'
+
+    9 Print: T_Print '(' T_StringConstant Actuals ')' ';'
+
+   10 Actuals: %empty
+   11        | Actuals ',' E
+
+   12 E: E '+' E
+   13  | E '-' E
+   14  | E '*' E
+   15  | E '/' E
+   16  | '-' E
+   17  | T_IntConstant
+   18  | T_Identifier
+   19  | '(' E ')'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 9 19
+')' (41) 9 19
+'*' (42) 14
+'+' (43) 12
+',' (44) 7 11
+'-' (45) 13 16
+'/' (47) 15
+';' (59) 3 8 9
+'=' (61) 8
+error (256)
+T_StringConstant (258) 9
+T_IntConstant (259) 17
+T_Identifier (260) 6 7 8 18
+T_Int (261) 6
+T_Print (262) 9
+U_neg (263)
+
+
+Nonterminals, with rules where they appear
+
+$accept (18)
+    on left: 0
+S (19)
+    on left: 1 2, on right: 0 2
+Stmt (20)
+    on left: 3 4 5, on right: 1 2
+VarDecl (21)
+    on left: 6 7, on right: 3 7
+Assign (22)
+    on left: 8, on right: 4
+Print (23)
+    on left: 9, on right: 5
+Actuals (24)
+    on left: 10 11, on right: 9 11
+E (25)
+    on left: 12 13 14 15 16 17 18 19, on right: 8 11 12 13 14 15 16
+    19
+
+
+State 0
+
+    0 $accept: . S $end
+
+    T_Identifier  shift, and go to state 1
+    T_Int         shift, and go to state 2
+    T_Print       shift, and go to state 3
+
+    S        go to state 4
+    Stmt     go to state 5
+    VarDecl  go to state 6
+    Assign   go to state 7
+    Print    go to state 8
+
+
+State 1
+
+    8 Assign: T_Identifier . '=' E ';'
+
+    '='  shift, and go to state 9
+
+
+State 2
+
+    6 VarDecl: T_Int . T_Identifier
+
+    T_Identifier  shift, and go to state 10
+
+
+State 3
+
+    9 Print: T_Print . '(' T_StringConstant Actuals ')' ';'
+
+    '('  shift, and go to state 11
+
+
+State 4
+
+    0 $accept: S . $end
+    2 S: S . Stmt
+
+    $end          shift, and go to state 12
+    T_Identifier  shift, and go to state 1
+    T_Int         shift, and go to state 2
+    T_Print       shift, and go to state 3
+
+    Stmt     go to state 13
+    VarDecl  go to state 6
+    Assign   go to state 7
+    Print    go to state 8
+
+
+State 5
+
+    1 S: Stmt .
+
+    $default  reduce using rule 1 (S)
+
+
+State 6
+
+    3 Stmt: VarDecl . ';'
+    7 VarDecl: VarDecl . ',' T_Identifier
+
+    ';'  shift, and go to state 14
+    ','  shift, and go to state 15
+
+
+State 7
+
+    4 Stmt: Assign .
+
+    $default  reduce using rule 4 (Stmt)
+
+
+State 8
+
+    5 Stmt: Print .
+
+    $default  reduce using rule 5 (Stmt)
+
+
+State 9
+
+    8 Assign: T_Identifier '=' . E ';'
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 20
+
+
+State 10
+
+    6 VarDecl: T_Int T_Identifier .
+
+    $default  reduce using rule 6 (VarDecl)
+
+
+State 11
+
+    9 Print: T_Print '(' . T_StringConstant Actuals ')' ';'
+
+    T_StringConstant  shift, and go to state 21
+
+
+State 12
+
+    0 $accept: S $end .
+
+    $default  accept
+
+
+State 13
+
+    2 S: S Stmt .
+
+    $default  reduce using rule 2 (S)
+
+
+State 14
+
+    3 Stmt: VarDecl ';' .
+
+    $default  reduce using rule 3 (Stmt)
+
+
+State 15
+
+    7 VarDecl: VarDecl ',' . T_Identifier
+
+    T_Identifier  shift, and go to state 22
+
+
+State 16
+
+   17 E: T_IntConstant .
+
+    $default  reduce using rule 17 (E)
+
+
+State 17
+
+   18 E: T_Identifier .
+
+    $default  reduce using rule 18 (E)
+
+
+State 18
+
+   16 E: '-' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 23
+
+
+State 19
+
+   19 E: '(' . E ')'
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 24
+
+
+State 20
+
+    8 Assign: T_Identifier '=' E . ';'
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+
+    '+'  shift, and go to state 25
+    '-'  shift, and go to state 26
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
+    ';'  shift, and go to state 29
+
+
+State 21
+
+    9 Print: T_Print '(' T_StringConstant . Actuals ')' ';'
+
+    $default  reduce using rule 10 (Actuals)
+
+    Actuals  go to state 30
+
+
+State 22
+
+    7 VarDecl: VarDecl ',' T_Identifier .
+
+    $default  reduce using rule 7 (VarDecl)
+
+
+State 23
+
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+   16  | '-' E .
+
+    $default  reduce using rule 16 (E)
+
+
+State 24
+
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+   19  | '(' E . ')'
+
+    '+'  shift, and go to state 25
+    '-'  shift, and go to state 26
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
+    ')'  shift, and go to state 31
+
+
+State 25
+
+   12 E: E '+' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 32
+
+
+State 26
+
+   13 E: E '-' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 33
+
+
+State 27
+
+   14 E: E '*' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 34
+
+
+State 28
+
+   15 E: E '/' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 35
+
+
+State 29
+
+    8 Assign: T_Identifier '=' E ';' .
+
+    $default  reduce using rule 8 (Assign)
+
+
+State 30
+
+    9 Print: T_Print '(' T_StringConstant Actuals . ')' ';'
+   11 Actuals: Actuals . ',' E
+
+    ','  shift, and go to state 36
+    ')'  shift, and go to state 37
+
+
+State 31
+
+   19 E: '(' E ')' .
+
+    $default  reduce using rule 19 (E)
+
+
+State 32
+
+   12 E: E . '+' E
+   12  | E '+' E .
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
+
+    $default  reduce using rule 12 (E)
+
+
+State 33
+
+   12 E: E . '+' E
+   13  | E . '-' E
+   13  | E '-' E .
+   14  | E . '*' E
+   15  | E . '/' E
+
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
+
+    $default  reduce using rule 13 (E)
+
+
+State 34
+
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   14  | E '*' E .
+   15  | E . '/' E
+
+    $default  reduce using rule 14 (E)
+
+
+State 35
+
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+   15  | E '/' E .
+
+    $default  reduce using rule 15 (E)
+
+
+State 36
+
+   11 Actuals: Actuals ',' . E
+
+    T_IntConstant  shift, and go to state 16
+    T_Identifier   shift, and go to state 17
+    '-'            shift, and go to state 18
+    '('            shift, and go to state 19
+
+    E  go to state 38
+
+
+State 37
+
+    9 Print: T_Print '(' T_StringConstant Actuals ')' . ';'
+
+    ';'  shift, and go to state 39
+
+
+State 38
+
+   11 Actuals: Actuals ',' E .
+   12 E: E . '+' E
+   13  | E . '-' E
+   14  | E . '*' E
+   15  | E . '/' E
+
+    '+'  shift, and go to state 25
+    '-'  shift, and go to state 26
+    '*'  shift, and go to state 27
+    '/'  shift, and go to state 28
+
+    $default  reduce using rule 11 (Actuals)
+
+
+State 39
+
+    9 Print: T_Print '(' T_StringConstant Actuals ')' ';' .
+
+    $default  reduce using rule 9 (Print)
