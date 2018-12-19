@@ -362,14 +362,14 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[80] =
     {   0,
-        0,    0,   28,   26,    1,   24,    4,   25,    3,    4,
-       26,    4,   21,    4,    4,    4,   23,   23,   23,   23,
-       23,   23,   23,   23,   23,   26,    1,   18,   25,   22,
-        3,   19,    2,   21,   15,   17,   16,   23,   23,   23,
-       23,   11,   23,   23,   23,   23,   23,   20,    2,   23,
-       23,   23,    5,   23,   23,   23,   23,   23,   23,   23,
-       12,   23,   23,   23,    6,   23,   13,   23,    8,   23,
-       23,   10,   23,   23,    7,   23,    9,   14,    0
+        0,    0,   28,   26,    2,    1,    5,   25,    4,    5,
+       26,    5,   22,    5,    5,    5,   24,   24,   24,   24,
+       24,   24,   24,   24,   24,   26,    2,   19,   25,   23,
+        4,   20,    3,   22,   16,   18,   17,   24,   24,   24,
+       24,   12,   24,   24,   24,   24,   24,   21,    3,   24,
+       24,   24,    6,   24,   24,   24,   24,   24,   24,   24,
+       13,   24,   24,   24,    7,   24,   14,   24,    9,   24,
+       24,   11,   24,   24,    8,   24,   10,   15,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -378,7 +378,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    4,    5,    6,    1,    7,    8,    1,    7,
-        7,    7,    7,    7,    7,    1,    9,   10,   10,   10,
+        7,    7,    7,    7,    7,    7,    9,   10,   10,   10,
        10,   10,   10,   10,   10,   10,   10,    1,    7,   11,
        12,   13,    1,    1,   14,   14,   14,   14,   14,   14,
        14,   14,   14,   14,   14,   14,   14,   14,   14,   14,
@@ -493,12 +493,13 @@ char *yytext;
 #define YYSTYPE char *
 #include "y.tab.h"
 int cur_line = 1;
-void yyerror(const char* msg);
+void yyerror(const char *msg);
 void unrecognized_char(char c);
 void unterminate_string();
-#define _DUPTEXT { yylval = strdup(yytext); }
+#define _DUPTEXT {yylval = strdup(yytext);}
 #line 501 "lex.yy.c"
-#line 502 "lex.yy.c"
+/* note \042 is '"' */
+#line 503 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -715,10 +716,10 @@ YY_DECL
 		}
 
 	{
-#line 20 "scanner.l"
+#line 21 "scanner.l"
 
 
-#line 722 "lex.yy.c"
+#line 723 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -776,130 +777,130 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
+/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 22 "scanner.l"
-{ }
+#line 23 "scanner.l"
+{ cur_line++; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 23 "scanner.l"
-{ }
+#line 24 "scanner.l"
+{ /* ignore every whitespace */ }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 24 "scanner.l"
-{ }
+#line 25 "scanner.l"
+{ /* skip for single line comment */    }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 26 "scanner.l"
-{ return yytext[0]; }
+{ /* skip for single line comment */    }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 27 "scanner.l"
-{ return T_Int;     }
+#line 28 "scanner.l"
+{ return yytext[0]; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 28 "scanner.l"
-{ return T_Void;    }
+#line 29 "scanner.l"
+{ return T_Int; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 29 "scanner.l"
-{ return T_Return;  }
+#line 30 "scanner.l"
+{ return T_Void; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 30 "scanner.l"
-{ return T_Print;   }
+#line 31 "scanner.l"
+{ return T_Return; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 31 "scanner.l"
-{ return T_ReadInt; }
+#line 32 "scanner.l"
+{ return T_Print; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 32 "scanner.l"
-{ return T_While;   }
+#line 33 "scanner.l"
+{ return T_ReadInt; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 33 "scanner.l"
-{ return T_If;      }
+#line 34 "scanner.l"
+{ return T_While; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 34 "scanner.l"
-{ return T_Else;    }
+#line 35 "scanner.l"
+{ return T_If; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 35 "scanner.l"
-{ return T_Break;   }
+#line 36 "scanner.l"
+{ return T_Else; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 36 "scanner.l"
-{ return T_Continue;}
+#line 37 "scanner.l"
+{ return T_Break; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 37 "scanner.l"
-{ return T_Le;      }
+#line 38 "scanner.l"
+{ return T_Continue; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 38 "scanner.l"
-{ return T_Ge;      }
+#line 39 "scanner.l"
+{ return T_Le; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 39 "scanner.l"
-{ return T_Eq;      }
+#line 40 "scanner.l"
+{ return T_Ge; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 40 "scanner.l"
-{ return T_Ne;      }
+#line 41 "scanner.l"
+{ return T_Eq; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 41 "scanner.l"
-{ return T_And;     }
+#line 42 "scanner.l"
+{ return T_Ne; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 42 "scanner.l"
-{ return T_Or;      }
+#line 43 "scanner.l"
+{ return T_And; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 44 "scanner.l"
-{ _DUPTEXT; return T_IntConstant;    }
+{ return T_Or; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 45 "scanner.l"
-{ _DUPTEXT; return T_StringConstant; }
+#line 46 "scanner.l"
+{ _DUPTEXT return T_IntConstant; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 46 "scanner.l"
-{ _DUPTEXT; return T_Identifier;     }
+#line 47 "scanner.l"
+{ _DUPTEXT return T_StringConstant; }
 	YY_BREAK
 case 24:
-/* rule 24 can match eol */
 YY_RULE_SETUP
 #line 48 "scanner.l"
-{ cur_line ++; }
+{ _DUPTEXT return T_Identifier; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 50 "scanner.l"
-{ unterminate_string();         }
+{ unterminate_string(); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
@@ -911,7 +912,7 @@ YY_RULE_SETUP
 #line 53 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 915 "lex.yy.c"
+#line 916 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1919,22 +1920,21 @@ void yyfree (void * ptr )
 #line 53 "scanner.l"
 
 
-int yywrap(void) {
+int yywrap(void) { 
     return 1;
 }
 
 void unrecognized_char(char c) {
-     char buf[32] = "Unrecognized character: ?";
-     buf[24] = c;
-     yyerror(buf);
+    char buf[32] = "Unrecognized character: ?";
+    buf[24] = c;
+    yyerror(buf);
 }
 
 void unterminate_string() {
-     yyerror("Unterminate string constant");
+    yyerror("Unterminate string constant");
 }
 
-void yyerror(const char* msg) {
-     printf("Error at line %d:\n\t%s\n", cur_line, msg);
-     exit(-1);
+void yyerror(const char *msg) {
+    fprintf(stderr, "Error at line %d:\n\t%s\n", cur_line, msg);
+    exit(-1);
 }
-

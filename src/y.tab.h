@@ -45,16 +45,16 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    T_Int = 258,
-    T_Void = 259,
-    T_Return = 260,
-    T_Print = 261,
-    T_ReadInt = 262,
-    T_While = 263,
-    T_If = 264,
-    T_Else = 265,
-    T_Break = 266,
-    T_Continue = 267,
+    T_Void = 258,
+    T_Int = 259,
+    T_While = 260,
+    T_If = 261,
+    T_Else = 262,
+    T_Return = 263,
+    T_Break = 264,
+    T_Continue = 265,
+    T_Print = 266,
+    T_ReadInt = 267,
     T_Le = 268,
     T_Ge = 269,
     T_Eq = 270,
@@ -67,16 +67,16 @@ extern int yydebug;
   };
 #endif
 /* Tokens.  */
-#define T_Int 258
-#define T_Void 259
-#define T_Return 260
-#define T_Print 261
-#define T_ReadInt 262
-#define T_While 263
-#define T_If 264
-#define T_Else 265
-#define T_Break 266
-#define T_Continue 267
+#define T_Void 258
+#define T_Int 259
+#define T_While 260
+#define T_If 261
+#define T_Else 262
+#define T_Return 263
+#define T_Break 264
+#define T_Continue 265
+#define T_Print 266
+#define T_ReadInt 267
 #define T_Le 268
 #define T_Ge 269
 #define T_Eq 270

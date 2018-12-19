@@ -1,282 +1,286 @@
 Grammar
 
-    0 $accept: Program $end
+    0 $accept: Start $end
 
-    1 Program: %empty
-    2        | Program FuncDecl
+    1 Start: Program
 
-    3 FuncDecl: RetType FuncName '(' Args ')' '{' VarDecls Stmts '}'
+    2 Program: %empty
+    3        | Program FuncDef
 
-    4 RetType: T_Int
-    5        | T_Void
+    4 FuncDef: T_Int FuncName Args Vars Stmts EndFuncDef
+    5        | T_Void FuncName Args Vars Stmts EndFuncDef
 
     6 FuncName: T_Identifier
 
-    7 Args: %empty
-    8     | _Args
+    7 Args: '(' ')'
+    8     | '(' _Args ')'
 
     9 _Args: T_Int T_Identifier
    10      | _Args ',' T_Int T_Identifier
 
-   11 VarDecls: %empty
-   12         | VarDecls VarDecl ';'
+   11 Vars: _Vars
 
-   13 VarDecl: T_Int T_Identifier
-   14        | VarDecl ',' T_Identifier
+   12 _Vars: '{'
+   13      | _Vars Var ';'
 
-   15 Stmts: %empty
-   16      | Stmts Stmt
+   14 Var: T_Int T_Identifier
+   15    | Var ',' T_Identifier
 
-   17 Stmt: AssignStmt
-   18     | PrintStmt
-   19     | CallStmt
-   20     | ReturnStmt
+   16 Stmts: %empty
+   17      | Stmts Stmt
+
+   18 EndFuncDef: '}'
+
+   19 Stmt: AssignStmt
+   20     | CallStmt
    21     | IfStmt
    22     | WhileStmt
    23     | BreakStmt
    24     | ContinueStmt
+   25     | ReturnStmt
+   26     | PrintStmt
 
-   25 AssignStmt: T_Identifier '=' Expr ';'
+   27 AssignStmt: T_Identifier '=' Expr ';'
 
-   26 PrintStmt: T_Print '(' T_StringConstant PActuals ')' ';'
+   28 CallStmt: CallExpr ';'
 
-   27 PActuals: %empty
-   28         | PActuals ',' Expr
+   29 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen EndIf
+   30       | If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
 
-   29 CallStmt: CallExpr ';'
+   31 If: T_If
 
-   30 CallExpr: T_Identifier '(' Actuals ')'
+   32 Then: %empty
 
-   31 Actuals: %empty
-   32        | Expr PActuals
+   33 EndThen: %empty
 
-   33 ReturnStmt: T_Return Expr ';'
-   34           | T_Return ';'
+   34 EndIf: %empty
 
-   35 IfStmt: If TestExpr Then StmtsBlock EndThen EndIf
-   36       | If TestExpr Then StmtsBlock EndThen Else StmtsBlock EndIf
+   35 WhileStmt: While '(' Expr ')' Do '{' Stmts '}' EndWhile
 
-   37 TestExpr: '(' Expr ')'
+   36 While: T_While
 
-   38 StmtsBlock: '{' Stmts '}'
+   37 Do: %empty
 
-   39 If: T_If
+   38 EndWhile: %empty
 
-   40 Then: %empty
+   39 BreakStmt: T_Break ';'
 
-   41 EndThen: %empty
+   40 ContinueStmt: T_Continue ';'
 
-   42 Else: T_Else
+   41 ReturnStmt: T_Return ';'
+   42           | T_Return Expr ';'
 
-   43 EndIf: %empty
+   43 PrintStmt: T_Print '(' T_StringConstant PrintIntArgs ')' ';'
 
-   44 WhileStmt: While TestExpr Do StmtsBlock EndWhile
+   44 PrintIntArgs: %empty
+   45             | PrintIntArgs ',' Expr
 
-   45 While: T_While
+   46 Expr: T_IntConstant
+   47     | T_Identifier
+   48     | Expr '+' Expr
+   49     | Expr '-' Expr
+   50     | Expr '*' Expr
+   51     | Expr '/' Expr
+   52     | Expr '%' Expr
+   53     | Expr '>' Expr
+   54     | Expr '<' Expr
+   55     | Expr T_Ge Expr
+   56     | Expr T_Le Expr
+   57     | Expr T_Eq Expr
+   58     | Expr T_Ne Expr
+   59     | Expr T_Or Expr
+   60     | Expr T_And Expr
+   61     | '-' Expr
+   62     | '!' Expr
+   63     | ReadInt
+   64     | CallExpr
+   65     | '(' Expr ')'
 
-   46 Do: %empty
+   66 ReadInt: T_ReadInt '(' T_StringConstant ')'
 
-   47 EndWhile: %empty
+   67 CallExpr: T_Identifier Actuals
 
-   48 BreakStmt: T_Break ';'
+   68 Actuals: '(' ')'
+   69        | '(' _Actuals ')'
 
-   49 ContinueStmt: T_Continue ';'
-
-   50 Expr: Expr '+' Expr
-   51     | Expr '-' Expr
-   52     | Expr '*' Expr
-   53     | Expr '/' Expr
-   54     | Expr '%' Expr
-   55     | Expr '>' Expr
-   56     | Expr '<' Expr
-   57     | Expr T_Ge Expr
-   58     | Expr T_Le Expr
-   59     | Expr T_Eq Expr
-   60     | Expr T_Ne Expr
-   61     | Expr T_Or Expr
-   62     | Expr T_And Expr
-   63     | '-' Expr
-   64     | '!' Expr
-   65     | T_IntConstant
-   66     | T_Identifier
-   67     | ReadInt
-   68     | CallExpr
-   69     | '(' Expr ')'
-
-   70 ReadInt: T_ReadInt '(' T_StringConstant ')'
+   70 _Actuals: Expr
+   71         | _Actuals ',' Expr
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-'!' (33) 64
-'%' (37) 54
-'(' (40) 3 26 30 37 69 70
-')' (41) 3 26 30 37 69 70
-'*' (42) 52
-'+' (43) 50
-',' (44) 10 14 28
-'-' (45) 51 63
-'/' (47) 53
-';' (59) 12 25 26 29 33 34 48 49
-'<' (60) 56
-'=' (61) 25
-'>' (62) 55
-'{' (123) 3 38
-'}' (125) 3 38
+'!' (33) 62
+'%' (37) 52
+'(' (40) 7 8 29 30 35 43 65 66 68 69
+')' (41) 7 8 29 30 35 43 65 66 68 69
+'*' (42) 50
+'+' (43) 48
+',' (44) 10 15 45 71
+'-' (45) 49 61
+'/' (47) 51
+';' (59) 13 27 28 39 40 41 42 43
+'<' (60) 54
+'=' (61) 27
+'>' (62) 53
+'{' (123) 12 29 30 35
+'}' (125) 18 29 30 35
 error (256)
-T_Int (258) 4 9 10 13
-T_Void (259) 5
-T_Return (260) 33 34
-T_Print (261) 26
-T_ReadInt (262) 70
-T_While (263) 45
-T_If (264) 39
-T_Else (265) 42
-T_Break (266) 48
-T_Continue (267) 49
-T_Le (268) 58
-T_Ge (269) 57
-T_Eq (270) 59
-T_Ne (271) 60
-T_And (272) 62
-T_Or (273) 61
-T_IntConstant (274) 65
-T_StringConstant (275) 26 70
-T_Identifier (276) 6 9 10 13 14 25 30 66
+T_Void (258) 5
+T_Int (259) 4 9 10 14
+T_While (260) 36
+T_If (261) 31
+T_Else (262) 30
+T_Return (263) 41 42
+T_Break (264) 39
+T_Continue (265) 40
+T_Print (266) 43
+T_ReadInt (267) 66
+T_Le (268) 56
+T_Ge (269) 55
+T_Eq (270) 57
+T_Ne (271) 58
+T_And (272) 60
+T_Or (273) 59
+T_IntConstant (274) 46
+T_StringConstant (275) 43 66
+T_Identifier (276) 6 9 10 14 15 27 47 67
 
 
 Nonterminals, with rules where they appear
 
 $accept (37)
     on left: 0
-Program (38)
-    on left: 1 2, on right: 0 2
-FuncDecl (39)
-    on left: 3, on right: 2
-RetType (40)
+Start (38)
+    on left: 1, on right: 0
+Program (39)
+    on left: 2 3, on right: 1 3
+FuncDef (40)
     on left: 4 5, on right: 3
 FuncName (41)
-    on left: 6, on right: 3
+    on left: 6, on right: 4 5
 Args (42)
-    on left: 7 8, on right: 3
+    on left: 7 8, on right: 4 5
 _Args (43)
     on left: 9 10, on right: 8 10
-VarDecls (44)
-    on left: 11 12, on right: 3 12
-VarDecl (45)
-    on left: 13 14, on right: 12 14
-Stmts (46)
-    on left: 15 16, on right: 3 16 38
-Stmt (47)
-    on left: 17 18 19 20 21 22 23 24, on right: 16
-AssignStmt (48)
-    on left: 25, on right: 17
-PrintStmt (49)
-    on left: 26, on right: 18
-PActuals (50)
-    on left: 27 28, on right: 26 28 32
+Vars (44)
+    on left: 11, on right: 4 5
+_Vars (45)
+    on left: 12 13, on right: 11 13
+Var (46)
+    on left: 14 15, on right: 13 15
+Stmts (47)
+    on left: 16 17, on right: 4 5 17 29 30 35
+EndFuncDef (48)
+    on left: 18, on right: 4 5
+Stmt (49)
+    on left: 19 20 21 22 23 24 25 26, on right: 17
+AssignStmt (50)
+    on left: 27, on right: 19
 CallStmt (51)
-    on left: 29, on right: 19
-CallExpr (52)
-    on left: 30, on right: 29 68
-Actuals (53)
-    on left: 31 32, on right: 30
-ReturnStmt (54)
-    on left: 33 34, on right: 20
-IfStmt (55)
-    on left: 35 36, on right: 21
-TestExpr (56)
-    on left: 37, on right: 35 36 44
-StmtsBlock (57)
-    on left: 38, on right: 35 36 44
-If (58)
-    on left: 39, on right: 35 36
-Then (59)
-    on left: 40, on right: 35 36
-EndThen (60)
-    on left: 41, on right: 35 36
-Else (61)
-    on left: 42, on right: 36
-EndIf (62)
-    on left: 43, on right: 35 36
-WhileStmt (63)
-    on left: 44, on right: 22
-While (64)
-    on left: 45, on right: 44
-Do (65)
-    on left: 46, on right: 44
-EndWhile (66)
-    on left: 47, on right: 44
-BreakStmt (67)
-    on left: 48, on right: 23
-ContinueStmt (68)
-    on left: 49, on right: 24
-Expr (69)
-    on left: 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67
-    68 69, on right: 25 28 32 33 37 50 51 52 53 54 55 56 57 58 59 60
-    61 62 63 64 69
-ReadInt (70)
-    on left: 70, on right: 67
+    on left: 28, on right: 20
+IfStmt (52)
+    on left: 29 30, on right: 21
+If (53)
+    on left: 31, on right: 29 30
+Then (54)
+    on left: 32, on right: 29 30
+EndThen (55)
+    on left: 33, on right: 29 30
+EndIf (56)
+    on left: 34, on right: 29 30
+WhileStmt (57)
+    on left: 35, on right: 22
+While (58)
+    on left: 36, on right: 35
+Do (59)
+    on left: 37, on right: 35
+EndWhile (60)
+    on left: 38, on right: 35
+BreakStmt (61)
+    on left: 39, on right: 23
+ContinueStmt (62)
+    on left: 40, on right: 24
+ReturnStmt (63)
+    on left: 41 42, on right: 25
+PrintStmt (64)
+    on left: 43, on right: 26
+PrintIntArgs (65)
+    on left: 44 45, on right: 43 45
+Expr (66)
+    on left: 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+    64 65, on right: 27 29 30 35 42 45 48 49 50 51 52 53 54 55 56 57
+    58 59 60 61 62 65 70 71
+ReadInt (67)
+    on left: 66, on right: 63
+CallExpr (68)
+    on left: 67, on right: 28 64
+Actuals (69)
+    on left: 68 69, on right: 67
+_Actuals (70)
+    on left: 70 71, on right: 69 71
 
 
 State 0
 
-    0 $accept: . Program $end
+    0 $accept: . Start $end
 
-    $default  reduce using rule 1 (Program)
+    $default  reduce using rule 2 (Program)
 
-    Program  go to state 1
+    Start    go to state 1
+    Program  go to state 2
 
 
 State 1
 
-    0 $accept: Program . $end
-    2 Program: Program . FuncDecl
+    0 $accept: Start . $end
 
-    $end    shift, and go to state 2
-    T_Int   shift, and go to state 3
-    T_Void  shift, and go to state 4
-
-    FuncDecl  go to state 5
-    RetType   go to state 6
+    $end  shift, and go to state 3
 
 
 State 2
 
-    0 $accept: Program $end .
+    1 Start: Program .
+    3 Program: Program . FuncDef
 
-    $default  accept
+    T_Void  shift, and go to state 4
+    T_Int   shift, and go to state 5
+
+    $default  reduce using rule 1 (Start)
+
+    FuncDef  go to state 6
 
 
 State 3
 
-    4 RetType: T_Int .
+    0 $accept: Start $end .
 
-    $default  reduce using rule 4 (RetType)
+    $default  accept
 
 
 State 4
 
-    5 RetType: T_Void .
-
-    $default  reduce using rule 5 (RetType)
-
-
-State 5
-
-    2 Program: Program FuncDecl .
-
-    $default  reduce using rule 2 (Program)
-
-
-State 6
-
-    3 FuncDecl: RetType . FuncName '(' Args ')' '{' VarDecls Stmts '}'
+    5 FuncDef: T_Void . FuncName Args Vars Stmts EndFuncDef
 
     T_Identifier  shift, and go to state 7
 
     FuncName  go to state 8
+
+
+State 5
+
+    4 FuncDef: T_Int . FuncName Args Vars Stmts EndFuncDef
+
+    T_Identifier  shift, and go to state 7
+
+    FuncName  go to state 9
+
+
+State 6
+
+    3 Program: Program FuncDef .
+
+    $default  reduce using rule 3 (Program)
 
 
 State 7
@@ -288,276 +292,310 @@ State 7
 
 State 8
 
-    3 FuncDecl: RetType FuncName . '(' Args ')' '{' VarDecls Stmts '}'
+    5 FuncDef: T_Void FuncName . Args Vars Stmts EndFuncDef
 
-    '('  shift, and go to state 9
+    '('  shift, and go to state 10
+
+    Args  go to state 11
 
 
 State 9
 
-    3 FuncDecl: RetType FuncName '(' . Args ')' '{' VarDecls Stmts '}'
+    4 FuncDef: T_Int FuncName . Args Vars Stmts EndFuncDef
 
-    T_Int  shift, and go to state 10
+    '('  shift, and go to state 10
 
-    $default  reduce using rule 7 (Args)
-
-    Args   go to state 11
-    _Args  go to state 12
+    Args  go to state 12
 
 
 State 10
 
-    9 _Args: T_Int . T_Identifier
+    7 Args: '(' . ')'
+    8     | '(' . _Args ')'
 
-    T_Identifier  shift, and go to state 13
+    T_Int  shift, and go to state 13
+    ')'    shift, and go to state 14
+
+    _Args  go to state 15
 
 
 State 11
 
-    3 FuncDecl: RetType FuncName '(' Args . ')' '{' VarDecls Stmts '}'
+    5 FuncDef: T_Void FuncName Args . Vars Stmts EndFuncDef
 
-    ')'  shift, and go to state 14
+    '{'  shift, and go to state 16
+
+    Vars   go to state 17
+    _Vars  go to state 18
 
 
 State 12
 
-    8 Args: _Args .
-   10 _Args: _Args . ',' T_Int T_Identifier
+    4 FuncDef: T_Int FuncName Args . Vars Stmts EndFuncDef
 
-    ','  shift, and go to state 15
+    '{'  shift, and go to state 16
 
-    $default  reduce using rule 8 (Args)
+    Vars   go to state 19
+    _Vars  go to state 18
 
 
 State 13
+
+    9 _Args: T_Int . T_Identifier
+
+    T_Identifier  shift, and go to state 20
+
+
+State 14
+
+    7 Args: '(' ')' .
+
+    $default  reduce using rule 7 (Args)
+
+
+State 15
+
+    8 Args: '(' _Args . ')'
+   10 _Args: _Args . ',' T_Int T_Identifier
+
+    ')'  shift, and go to state 21
+    ','  shift, and go to state 22
+
+
+State 16
+
+   12 _Vars: '{' .
+
+    $default  reduce using rule 12 (_Vars)
+
+
+State 17
+
+    5 FuncDef: T_Void FuncName Args Vars . Stmts EndFuncDef
+
+    $default  reduce using rule 16 (Stmts)
+
+    Stmts  go to state 23
+
+
+State 18
+
+   11 Vars: _Vars .
+   13 _Vars: _Vars . Var ';'
+
+    T_Int  shift, and go to state 24
+
+    $default  reduce using rule 11 (Vars)
+
+    Var  go to state 25
+
+
+State 19
+
+    4 FuncDef: T_Int FuncName Args Vars . Stmts EndFuncDef
+
+    $default  reduce using rule 16 (Stmts)
+
+    Stmts  go to state 26
+
+
+State 20
 
     9 _Args: T_Int T_Identifier .
 
     $default  reduce using rule 9 (_Args)
 
 
-State 14
-
-    3 FuncDecl: RetType FuncName '(' Args ')' . '{' VarDecls Stmts '}'
-
-    '{'  shift, and go to state 16
-
-
-State 15
-
-   10 _Args: _Args ',' . T_Int T_Identifier
-
-    T_Int  shift, and go to state 17
-
-
-State 16
-
-    3 FuncDecl: RetType FuncName '(' Args ')' '{' . VarDecls Stmts '}'
-
-    $default  reduce using rule 11 (VarDecls)
-
-    VarDecls  go to state 18
-
-
-State 17
-
-   10 _Args: _Args ',' T_Int . T_Identifier
-
-    T_Identifier  shift, and go to state 19
-
-
-State 18
-
-    3 FuncDecl: RetType FuncName '(' Args ')' '{' VarDecls . Stmts '}'
-   12 VarDecls: VarDecls . VarDecl ';'
-
-    T_Int  shift, and go to state 20
-
-    $default  reduce using rule 15 (Stmts)
-
-    VarDecl  go to state 21
-    Stmts    go to state 22
-
-
-State 19
-
-   10 _Args: _Args ',' T_Int T_Identifier .
-
-    $default  reduce using rule 10 (_Args)
-
-
-State 20
-
-   13 VarDecl: T_Int . T_Identifier
-
-    T_Identifier  shift, and go to state 23
-
-
 State 21
 
-   12 VarDecls: VarDecls VarDecl . ';'
-   14 VarDecl: VarDecl . ',' T_Identifier
+    8 Args: '(' _Args ')' .
 
-    ','  shift, and go to state 24
-    ';'  shift, and go to state 25
+    $default  reduce using rule 8 (Args)
 
 
 State 22
 
-    3 FuncDecl: RetType FuncName '(' Args ')' '{' VarDecls Stmts . '}'
-   16 Stmts: Stmts . Stmt
+   10 _Args: _Args ',' . T_Int T_Identifier
 
-    T_Return      shift, and go to state 26
-    T_Print       shift, and go to state 27
+    T_Int  shift, and go to state 27
+
+
+State 23
+
+    5 FuncDef: T_Void FuncName Args Vars Stmts . EndFuncDef
+   17 Stmts: Stmts . Stmt
+
     T_While       shift, and go to state 28
     T_If          shift, and go to state 29
-    T_Break       shift, and go to state 30
-    T_Continue    shift, and go to state 31
-    T_Identifier  shift, and go to state 32
-    '}'           shift, and go to state 33
+    T_Return      shift, and go to state 30
+    T_Break       shift, and go to state 31
+    T_Continue    shift, and go to state 32
+    T_Print       shift, and go to state 33
+    T_Identifier  shift, and go to state 34
+    '}'           shift, and go to state 35
 
-    Stmt          go to state 34
-    AssignStmt    go to state 35
-    PrintStmt     go to state 36
-    CallStmt      go to state 37
-    CallExpr      go to state 38
-    ReturnStmt    go to state 39
+    EndFuncDef    go to state 36
+    Stmt          go to state 37
+    AssignStmt    go to state 38
+    CallStmt      go to state 39
     IfStmt        go to state 40
     If            go to state 41
     WhileStmt     go to state 42
     While         go to state 43
     BreakStmt     go to state 44
     ContinueStmt  go to state 45
-
-
-State 23
-
-   13 VarDecl: T_Int T_Identifier .
-
-    $default  reduce using rule 13 (VarDecl)
+    ReturnStmt    go to state 46
+    PrintStmt     go to state 47
+    CallExpr      go to state 48
 
 
 State 24
 
-   14 VarDecl: VarDecl ',' . T_Identifier
+   14 Var: T_Int . T_Identifier
 
-    T_Identifier  shift, and go to state 46
+    T_Identifier  shift, and go to state 49
 
 
 State 25
 
-   12 VarDecls: VarDecls VarDecl ';' .
+   13 _Vars: _Vars Var . ';'
+   15 Var: Var . ',' T_Identifier
 
-    $default  reduce using rule 12 (VarDecls)
+    ','  shift, and go to state 50
+    ';'  shift, and go to state 51
 
 
 State 26
 
-   33 ReturnStmt: T_Return . Expr ';'
-   34           | T_Return . ';'
+    4 FuncDef: T_Int FuncName Args Vars Stmts . EndFuncDef
+   17 Stmts: Stmts . Stmt
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-    ';'            shift, and go to state 53
+    T_While       shift, and go to state 28
+    T_If          shift, and go to state 29
+    T_Return      shift, and go to state 30
+    T_Break       shift, and go to state 31
+    T_Continue    shift, and go to state 32
+    T_Print       shift, and go to state 33
+    T_Identifier  shift, and go to state 34
+    '}'           shift, and go to state 35
 
-    CallExpr  go to state 54
-    Expr      go to state 55
-    ReadInt   go to state 56
+    EndFuncDef    go to state 52
+    Stmt          go to state 37
+    AssignStmt    go to state 38
+    CallStmt      go to state 39
+    IfStmt        go to state 40
+    If            go to state 41
+    WhileStmt     go to state 42
+    While         go to state 43
+    BreakStmt     go to state 44
+    ContinueStmt  go to state 45
+    ReturnStmt    go to state 46
+    PrintStmt     go to state 47
+    CallExpr      go to state 48
 
 
 State 27
 
-   26 PrintStmt: T_Print . '(' T_StringConstant PActuals ')' ';'
+   10 _Args: _Args ',' T_Int . T_Identifier
 
-    '('  shift, and go to state 57
+    T_Identifier  shift, and go to state 53
 
 
 State 28
 
-   45 While: T_While .
+   36 While: T_While .
 
-    $default  reduce using rule 45 (While)
+    $default  reduce using rule 36 (While)
 
 
 State 29
 
-   39 If: T_If .
+   31 If: T_If .
 
-    $default  reduce using rule 39 (If)
+    $default  reduce using rule 31 (If)
 
 
 State 30
 
-   48 BreakStmt: T_Break . ';'
+   41 ReturnStmt: T_Return . ';'
+   42           | T_Return . Expr ';'
 
-    ';'  shift, and go to state 58
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+    ';'            shift, and go to state 60
+
+    Expr      go to state 61
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 31
 
-   49 ContinueStmt: T_Continue . ';'
+   39 BreakStmt: T_Break . ';'
 
-    ';'  shift, and go to state 59
+    ';'  shift, and go to state 64
 
 
 State 32
 
-   25 AssignStmt: T_Identifier . '=' Expr ';'
-   30 CallExpr: T_Identifier . '(' Actuals ')'
+   40 ContinueStmt: T_Continue . ';'
 
-    '='  shift, and go to state 60
-    '('  shift, and go to state 61
+    ';'  shift, and go to state 65
 
 
 State 33
 
-    3 FuncDecl: RetType FuncName '(' Args ')' '{' VarDecls Stmts '}' .
+   43 PrintStmt: T_Print . '(' T_StringConstant PrintIntArgs ')' ';'
 
-    $default  reduce using rule 3 (FuncDecl)
+    '('  shift, and go to state 66
 
 
 State 34
 
-   16 Stmts: Stmts Stmt .
+   27 AssignStmt: T_Identifier . '=' Expr ';'
+   67 CallExpr: T_Identifier . Actuals
 
-    $default  reduce using rule 16 (Stmts)
+    '='  shift, and go to state 67
+    '('  shift, and go to state 68
+
+    Actuals  go to state 69
 
 
 State 35
 
-   17 Stmt: AssignStmt .
+   18 EndFuncDef: '}' .
 
-    $default  reduce using rule 17 (Stmt)
+    $default  reduce using rule 18 (EndFuncDef)
 
 
 State 36
 
-   18 Stmt: PrintStmt .
+    5 FuncDef: T_Void FuncName Args Vars Stmts EndFuncDef .
 
-    $default  reduce using rule 18 (Stmt)
+    $default  reduce using rule 5 (FuncDef)
 
 
 State 37
 
-   19 Stmt: CallStmt .
+   17 Stmts: Stmts Stmt .
 
-    $default  reduce using rule 19 (Stmt)
+    $default  reduce using rule 17 (Stmts)
 
 
 State 38
 
-   29 CallStmt: CallExpr . ';'
+   19 Stmt: AssignStmt .
 
-    ';'  shift, and go to state 62
+    $default  reduce using rule 19 (Stmt)
 
 
 State 39
 
-   20 Stmt: ReturnStmt .
+   20 Stmt: CallStmt .
 
     $default  reduce using rule 20 (Stmt)
 
@@ -571,12 +609,10 @@ State 40
 
 State 41
 
-   35 IfStmt: If . TestExpr Then StmtsBlock EndThen EndIf
-   36       | If . TestExpr Then StmtsBlock EndThen Else StmtsBlock EndIf
+   29 IfStmt: If . '(' Expr ')' Then '{' Stmts '}' EndThen EndIf
+   30       | If . '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
 
-    '('  shift, and go to state 63
-
-    TestExpr  go to state 64
+    '('  shift, and go to state 70
 
 
 State 42
@@ -588,11 +624,9 @@ State 42
 
 State 43
 
-   44 WhileStmt: While . TestExpr Do StmtsBlock EndWhile
+   35 WhileStmt: While . '(' Expr ')' Do '{' Stmts '}' EndWhile
 
-    '('  shift, and go to state 63
-
-    TestExpr  go to state 65
+    '('  shift, and go to state 71
 
 
 State 44
@@ -611,1246 +645,1457 @@ State 45
 
 State 46
 
-   14 VarDecl: VarDecl ',' T_Identifier .
+   25 Stmt: ReturnStmt .
 
-    $default  reduce using rule 14 (VarDecl)
+    $default  reduce using rule 25 (Stmt)
 
 
 State 47
 
-   70 ReadInt: T_ReadInt . '(' T_StringConstant ')'
+   26 Stmt: PrintStmt .
 
-    '('  shift, and go to state 66
+    $default  reduce using rule 26 (Stmt)
 
 
 State 48
 
-   65 Expr: T_IntConstant .
+   28 CallStmt: CallExpr . ';'
 
-    $default  reduce using rule 65 (Expr)
+    ';'  shift, and go to state 72
 
 
 State 49
 
-   30 CallExpr: T_Identifier . '(' Actuals ')'
-   66 Expr: T_Identifier .
+   14 Var: T_Int T_Identifier .
 
-    '('  shift, and go to state 61
-
-    $default  reduce using rule 66 (Expr)
+    $default  reduce using rule 14 (Var)
 
 
 State 50
 
-   63 Expr: '-' . Expr
+   15 Var: Var ',' . T_Identifier
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 67
-    ReadInt   go to state 56
+    T_Identifier  shift, and go to state 73
 
 
 State 51
 
-   64 Expr: '!' . Expr
+   13 _Vars: _Vars Var ';' .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 68
-    ReadInt   go to state 56
+    $default  reduce using rule 13 (_Vars)
 
 
 State 52
 
-   69 Expr: '(' . Expr ')'
+    4 FuncDef: T_Int FuncName Args Vars Stmts EndFuncDef .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 69
-    ReadInt   go to state 56
+    $default  reduce using rule 4 (FuncDef)
 
 
 State 53
 
-   34 ReturnStmt: T_Return ';' .
+   10 _Args: _Args ',' T_Int T_Identifier .
 
-    $default  reduce using rule 34 (ReturnStmt)
+    $default  reduce using rule 10 (_Args)
 
 
 State 54
 
-   68 Expr: CallExpr .
+   66 ReadInt: T_ReadInt . '(' T_StringConstant ')'
 
-    $default  reduce using rule 68 (Expr)
+    '('  shift, and go to state 74
 
 
 State 55
 
-   33 ReturnStmt: T_Return Expr . ';'
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   46 Expr: T_IntConstant .
 
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-    ';'    shift, and go to state 83
+    $default  reduce using rule 46 (Expr)
 
 
 State 56
 
-   67 Expr: ReadInt .
+   47 Expr: T_Identifier .
+   67 CallExpr: T_Identifier . Actuals
 
-    $default  reduce using rule 67 (Expr)
+    '('  shift, and go to state 68
+
+    $default  reduce using rule 47 (Expr)
+
+    Actuals  go to state 69
 
 
 State 57
 
-   26 PrintStmt: T_Print '(' . T_StringConstant PActuals ')' ';'
+   61 Expr: '-' . Expr
 
-    T_StringConstant  shift, and go to state 84
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 75
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 58
 
-   48 BreakStmt: T_Break ';' .
+   62 Expr: '!' . Expr
 
-    $default  reduce using rule 48 (BreakStmt)
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 76
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 59
 
-   49 ContinueStmt: T_Continue ';' .
+   65 Expr: '(' . Expr ')'
 
-    $default  reduce using rule 49 (ContinueStmt)
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 77
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 60
 
-   25 AssignStmt: T_Identifier '=' . Expr ';'
+   41 ReturnStmt: T_Return ';' .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 85
-    ReadInt   go to state 56
+    $default  reduce using rule 41 (ReturnStmt)
 
 
 State 61
 
-   30 CallExpr: T_Identifier '(' . Actuals ')'
+   42 ReturnStmt: T_Return Expr . ';'
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    $default  reduce using rule 31 (Actuals)
-
-    CallExpr  go to state 54
-    Actuals   go to state 86
-    Expr      go to state 87
-    ReadInt   go to state 56
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+    ';'    shift, and go to state 91
 
 
 State 62
 
-   29 CallStmt: CallExpr ';' .
-
-    $default  reduce using rule 29 (CallStmt)
-
-
-State 63
-
-   37 TestExpr: '(' . Expr ')'
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 88
-    ReadInt   go to state 56
-
-
-State 64
-
-   35 IfStmt: If TestExpr . Then StmtsBlock EndThen EndIf
-   36       | If TestExpr . Then StmtsBlock EndThen Else StmtsBlock EndIf
-
-    $default  reduce using rule 40 (Then)
-
-    Then  go to state 89
-
-
-State 65
-
-   44 WhileStmt: While TestExpr . Do StmtsBlock EndWhile
-
-    $default  reduce using rule 46 (Do)
-
-    Do  go to state 90
-
-
-State 66
-
-   70 ReadInt: T_ReadInt '(' . T_StringConstant ')'
-
-    T_StringConstant  shift, and go to state 91
-
-
-State 67
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-   63     | '-' Expr .
+   63 Expr: ReadInt .
 
     $default  reduce using rule 63 (Expr)
 
 
-State 68
+State 63
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-   64     | '!' Expr .
+   64 Expr: CallExpr .
 
     $default  reduce using rule 64 (Expr)
 
 
+State 64
+
+   39 BreakStmt: T_Break ';' .
+
+    $default  reduce using rule 39 (BreakStmt)
+
+
+State 65
+
+   40 ContinueStmt: T_Continue ';' .
+
+    $default  reduce using rule 40 (ContinueStmt)
+
+
+State 66
+
+   43 PrintStmt: T_Print '(' . T_StringConstant PrintIntArgs ')' ';'
+
+    T_StringConstant  shift, and go to state 92
+
+
+State 67
+
+   27 AssignStmt: T_Identifier '=' . Expr ';'
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 93
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 68
+
+   68 Actuals: '(' . ')'
+   69        | '(' . _Actuals ')'
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+    ')'            shift, and go to state 94
+
+    Expr      go to state 95
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+    _Actuals  go to state 96
+
+
 State 69
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-   69     | '(' Expr . ')'
+   67 CallExpr: T_Identifier Actuals .
 
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-    ')'    shift, and go to state 92
+    $default  reduce using rule 67 (CallExpr)
 
 
 State 70
 
-   58 Expr: Expr T_Le . Expr
+   29 IfStmt: If '(' . Expr ')' Then '{' Stmts '}' EndThen EndIf
+   30       | If '(' . Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
 
-    CallExpr  go to state 54
-    Expr      go to state 93
-    ReadInt   go to state 56
+    Expr      go to state 97
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 71
 
-   57 Expr: Expr T_Ge . Expr
+   35 WhileStmt: While '(' . Expr ')' Do '{' Stmts '}' EndWhile
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
 
-    CallExpr  go to state 54
-    Expr      go to state 94
-    ReadInt   go to state 56
+    Expr      go to state 98
+    ReadInt   go to state 62
+    CallExpr  go to state 63
 
 
 State 72
 
-   59 Expr: Expr T_Eq . Expr
+   28 CallStmt: CallExpr ';' .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 95
-    ReadInt   go to state 56
+    $default  reduce using rule 28 (CallStmt)
 
 
 State 73
 
-   60 Expr: Expr T_Ne . Expr
+   15 Var: Var ',' T_Identifier .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 96
-    ReadInt   go to state 56
+    $default  reduce using rule 15 (Var)
 
 
 State 74
 
-   62 Expr: Expr T_And . Expr
+   66 ReadInt: T_ReadInt '(' . T_StringConstant ')'
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 97
-    ReadInt   go to state 56
+    T_StringConstant  shift, and go to state 99
 
 
 State 75
 
-   61 Expr: Expr T_Or . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 98
-    ReadInt   go to state 56
-
-
-State 76
-
-   56 Expr: Expr '<' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 99
-    ReadInt   go to state 56
-
-
-State 77
-
-   55 Expr: Expr '>' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 100
-    ReadInt   go to state 56
-
-
-State 78
-
-   50 Expr: Expr '+' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 101
-    ReadInt   go to state 56
-
-
-State 79
-
-   51 Expr: Expr '-' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 102
-    ReadInt   go to state 56
-
-
-State 80
-
-   52 Expr: Expr '*' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 103
-    ReadInt   go to state 56
-
-
-State 81
-
-   53 Expr: Expr '/' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 104
-    ReadInt   go to state 56
-
-
-State 82
-
-   54 Expr: Expr '%' . Expr
-
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 105
-    ReadInt   go to state 56
-
-
-State 83
-
-   33 ReturnStmt: T_Return Expr ';' .
-
-    $default  reduce using rule 33 (ReturnStmt)
-
-
-State 84
-
-   26 PrintStmt: T_Print '(' T_StringConstant . PActuals ')' ';'
-
-    $default  reduce using rule 27 (PActuals)
-
-    PActuals  go to state 106
-
-
-State 85
-
-   25 AssignStmt: T_Identifier '=' Expr . ';'
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-    ';'    shift, and go to state 107
-
-
-State 86
-
-   30 CallExpr: T_Identifier '(' Actuals . ')'
-
-    ')'  shift, and go to state 108
-
-
-State 87
-
-   32 Actuals: Expr . PActuals
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-
-    $default  reduce using rule 27 (PActuals)
-
-    PActuals  go to state 109
-
-
-State 88
-
-   37 TestExpr: '(' Expr . ')'
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-    ')'    shift, and go to state 110
-
-
-State 89
-
-   35 IfStmt: If TestExpr Then . StmtsBlock EndThen EndIf
-   36       | If TestExpr Then . StmtsBlock EndThen Else StmtsBlock EndIf
-
-    '{'  shift, and go to state 111
-
-    StmtsBlock  go to state 112
-
-
-State 90
-
-   44 WhileStmt: While TestExpr Do . StmtsBlock EndWhile
-
-    '{'  shift, and go to state 111
-
-    StmtsBlock  go to state 113
-
-
-State 91
-
-   70 ReadInt: T_ReadInt '(' T_StringConstant . ')'
-
-    ')'  shift, and go to state 114
-
-
-State 92
-
-   69 Expr: '(' Expr ')' .
-
-    $default  reduce using rule 69 (Expr)
-
-
-State 93
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   58     | Expr T_Le Expr .
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    '+'  shift, and go to state 78
-    '-'  shift, and go to state 79
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
-
-    $default  reduce using rule 58 (Expr)
-
-
-State 94
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   57     | Expr T_Ge Expr .
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    '+'  shift, and go to state 78
-    '-'  shift, and go to state 79
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
-
-    $default  reduce using rule 57 (Expr)
-
-
-State 95
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   59     | Expr T_Eq Expr .
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le  shift, and go to state 70
-    T_Ge  shift, and go to state 71
-    '<'   shift, and go to state 76
-    '>'   shift, and go to state 77
-    '+'   shift, and go to state 78
-    '-'   shift, and go to state 79
-    '*'   shift, and go to state 80
-    '/'   shift, and go to state 81
-    '%'   shift, and go to state 82
-
-    $default  reduce using rule 59 (Expr)
-
-
-State 96
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   60     | Expr T_Ne Expr .
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le  shift, and go to state 70
-    T_Ge  shift, and go to state 71
-    '<'   shift, and go to state 76
-    '>'   shift, and go to state 77
-    '+'   shift, and go to state 78
-    '-'   shift, and go to state 79
-    '*'   shift, and go to state 80
-    '/'   shift, and go to state 81
-    '%'   shift, and go to state 82
-
-    $default  reduce using rule 60 (Expr)
-
-
-State 97
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-   62     | Expr T_And Expr .
-
-    T_Le  shift, and go to state 70
-    T_Ge  shift, and go to state 71
-    T_Eq  shift, and go to state 72
-    T_Ne  shift, and go to state 73
-    '<'   shift, and go to state 76
-    '>'   shift, and go to state 77
-    '+'   shift, and go to state 78
-    '-'   shift, and go to state 79
-    '*'   shift, and go to state 80
-    '/'   shift, and go to state 81
-    '%'   shift, and go to state 82
-
-    $default  reduce using rule 62 (Expr)
-
-
-State 98
-
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   61     | Expr T_Or Expr .
-   62     | Expr . T_And Expr
-
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   61     | '-' Expr .
 
     $default  reduce using rule 61 (Expr)
 
 
+State 76
+
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   62     | '!' Expr .
+
+    $default  reduce using rule 62 (Expr)
+
+
+State 77
+
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   65     | '(' Expr . ')'
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+    ')'    shift, and go to state 100
+
+
+State 78
+
+   56 Expr: Expr T_Le . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 101
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 79
+
+   55 Expr: Expr T_Ge . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 102
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 80
+
+   57 Expr: Expr T_Eq . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 103
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 81
+
+   58 Expr: Expr T_Ne . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 104
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 82
+
+   60 Expr: Expr T_And . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 105
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 83
+
+   59 Expr: Expr T_Or . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 106
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 84
+
+   54 Expr: Expr '<' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 107
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 85
+
+   53 Expr: Expr '>' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 108
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 86
+
+   48 Expr: Expr '+' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 109
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 87
+
+   49 Expr: Expr '-' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 110
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 88
+
+   50 Expr: Expr '*' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 111
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 89
+
+   51 Expr: Expr '/' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 112
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 90
+
+   52 Expr: Expr '%' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 113
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 91
+
+   42 ReturnStmt: T_Return Expr ';' .
+
+    $default  reduce using rule 42 (ReturnStmt)
+
+
+State 92
+
+   43 PrintStmt: T_Print '(' T_StringConstant . PrintIntArgs ')' ';'
+
+    $default  reduce using rule 44 (PrintIntArgs)
+
+    PrintIntArgs  go to state 114
+
+
+State 93
+
+   27 AssignStmt: T_Identifier '=' Expr . ';'
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+    ';'    shift, and go to state 115
+
+
+State 94
+
+   68 Actuals: '(' ')' .
+
+    $default  reduce using rule 68 (Actuals)
+
+
+State 95
+
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   70 _Actuals: Expr .
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+
+    $default  reduce using rule 70 (_Actuals)
+
+
+State 96
+
+   69 Actuals: '(' _Actuals . ')'
+   71 _Actuals: _Actuals . ',' Expr
+
+    ')'  shift, and go to state 116
+    ','  shift, and go to state 117
+
+
+State 97
+
+   29 IfStmt: If '(' Expr . ')' Then '{' Stmts '}' EndThen EndIf
+   30       | If '(' Expr . ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+    ')'    shift, and go to state 118
+
+
+State 98
+
+   35 WhileStmt: While '(' Expr . ')' Do '{' Stmts '}' EndWhile
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+    ')'    shift, and go to state 119
+
+
 State 99
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   56     | Expr '<' Expr .
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   66 ReadInt: T_ReadInt '(' T_StringConstant . ')'
 
-    '+'  shift, and go to state 78
-    '-'  shift, and go to state 79
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
-
-    $default  reduce using rule 56 (Expr)
+    ')'  shift, and go to state 120
 
 
 State 100
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   55     | Expr '>' Expr .
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   65 Expr: '(' Expr ')' .
 
-    '+'  shift, and go to state 78
-    '-'  shift, and go to state 79
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
-
-    $default  reduce using rule 55 (Expr)
+    $default  reduce using rule 65 (Expr)
 
 
 State 101
 
-   50 Expr: Expr . '+' Expr
-   50     | Expr '+' Expr .
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   56     | Expr T_Le Expr .
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
 
-    $default  reduce using rule 50 (Expr)
+    $default  reduce using rule 56 (Expr)
 
 
 State 102
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   51     | Expr '-' Expr .
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   55     | Expr T_Ge Expr .
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    '*'  shift, and go to state 80
-    '/'  shift, and go to state 81
-    '%'  shift, and go to state 82
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
 
-    $default  reduce using rule 51 (Expr)
+    $default  reduce using rule 55 (Expr)
 
 
 State 103
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   52     | Expr '*' Expr .
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   57     | Expr T_Eq Expr .
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 52 (Expr)
+    T_Le  shift, and go to state 78
+    T_Ge  shift, and go to state 79
+    '<'   shift, and go to state 84
+    '>'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+    '*'   shift, and go to state 88
+    '/'   shift, and go to state 89
+    '%'   shift, and go to state 90
+
+    $default  reduce using rule 57 (Expr)
 
 
 State 104
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   53     | Expr '/' Expr .
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   58     | Expr T_Ne Expr .
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 53 (Expr)
+    T_Le  shift, and go to state 78
+    T_Ge  shift, and go to state 79
+    '<'   shift, and go to state 84
+    '>'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+    '*'   shift, and go to state 88
+    '/'   shift, and go to state 89
+    '%'   shift, and go to state 90
+
+    $default  reduce using rule 58 (Expr)
 
 
 State 105
 
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   54     | Expr '%' Expr .
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   60     | Expr T_And Expr .
 
-    $default  reduce using rule 54 (Expr)
+    T_Le  shift, and go to state 78
+    T_Ge  shift, and go to state 79
+    T_Eq  shift, and go to state 80
+    T_Ne  shift, and go to state 81
+    '<'   shift, and go to state 84
+    '>'   shift, and go to state 85
+    '+'   shift, and go to state 86
+    '-'   shift, and go to state 87
+    '*'   shift, and go to state 88
+    '/'   shift, and go to state 89
+    '%'   shift, and go to state 90
+
+    $default  reduce using rule 60 (Expr)
 
 
 State 106
 
-   26 PrintStmt: T_Print '(' T_StringConstant PActuals . ')' ';'
-   28 PActuals: PActuals . ',' Expr
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   59     | Expr T_Or Expr .
+   60     | Expr . T_And Expr
 
-    ')'  shift, and go to state 115
-    ','  shift, and go to state 116
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+
+    $default  reduce using rule 59 (Expr)
 
 
 State 107
 
-   25 AssignStmt: T_Identifier '=' Expr ';' .
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   54     | Expr '<' Expr .
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 25 (AssignStmt)
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
+
+    $default  reduce using rule 54 (Expr)
 
 
 State 108
 
-   30 CallExpr: T_Identifier '(' Actuals ')' .
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   53     | Expr '>' Expr .
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 30 (CallExpr)
+    '+'  shift, and go to state 86
+    '-'  shift, and go to state 87
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
+
+    $default  reduce using rule 53 (Expr)
 
 
 State 109
 
-   28 PActuals: PActuals . ',' Expr
-   32 Actuals: Expr PActuals .
+   48 Expr: Expr . '+' Expr
+   48     | Expr '+' Expr .
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    ','  shift, and go to state 116
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
 
-    $default  reduce using rule 32 (Actuals)
+    $default  reduce using rule 48 (Expr)
 
 
 State 110
 
-   37 TestExpr: '(' Expr ')' .
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   49     | Expr '-' Expr .
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 37 (TestExpr)
+    '*'  shift, and go to state 88
+    '/'  shift, and go to state 89
+    '%'  shift, and go to state 90
+
+    $default  reduce using rule 49 (Expr)
 
 
 State 111
 
-   38 StmtsBlock: '{' . Stmts '}'
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   50     | Expr '*' Expr .
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 15 (Stmts)
-
-    Stmts  go to state 117
+    $default  reduce using rule 50 (Expr)
 
 
 State 112
 
-   35 IfStmt: If TestExpr Then StmtsBlock . EndThen EndIf
-   36       | If TestExpr Then StmtsBlock . EndThen Else StmtsBlock EndIf
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   51     | Expr '/' Expr .
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 41 (EndThen)
-
-    EndThen  go to state 118
+    $default  reduce using rule 51 (Expr)
 
 
 State 113
 
-   44 WhileStmt: While TestExpr Do StmtsBlock . EndWhile
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   52     | Expr '%' Expr .
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
 
-    $default  reduce using rule 47 (EndWhile)
-
-    EndWhile  go to state 119
+    $default  reduce using rule 52 (Expr)
 
 
 State 114
 
-   70 ReadInt: T_ReadInt '(' T_StringConstant ')' .
+   43 PrintStmt: T_Print '(' T_StringConstant PrintIntArgs . ')' ';'
+   45 PrintIntArgs: PrintIntArgs . ',' Expr
 
-    $default  reduce using rule 70 (ReadInt)
+    ')'  shift, and go to state 121
+    ','  shift, and go to state 122
 
 
 State 115
 
-   26 PrintStmt: T_Print '(' T_StringConstant PActuals ')' . ';'
+   27 AssignStmt: T_Identifier '=' Expr ';' .
 
-    ';'  shift, and go to state 120
+    $default  reduce using rule 27 (AssignStmt)
 
 
 State 116
 
-   28 PActuals: PActuals ',' . Expr
+   69 Actuals: '(' _Actuals ')' .
 
-    T_ReadInt      shift, and go to state 47
-    T_IntConstant  shift, and go to state 48
-    T_Identifier   shift, and go to state 49
-    '-'            shift, and go to state 50
-    '!'            shift, and go to state 51
-    '('            shift, and go to state 52
-
-    CallExpr  go to state 54
-    Expr      go to state 121
-    ReadInt   go to state 56
+    $default  reduce using rule 69 (Actuals)
 
 
 State 117
 
-   16 Stmts: Stmts . Stmt
-   38 StmtsBlock: '{' Stmts . '}'
+   71 _Actuals: _Actuals ',' . Expr
 
-    T_Return      shift, and go to state 26
-    T_Print       shift, and go to state 27
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 123
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 118
+
+   29 IfStmt: If '(' Expr ')' . Then '{' Stmts '}' EndThen EndIf
+   30       | If '(' Expr ')' . Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
+
+    $default  reduce using rule 32 (Then)
+
+    Then  go to state 124
+
+
+State 119
+
+   35 WhileStmt: While '(' Expr ')' . Do '{' Stmts '}' EndWhile
+
+    $default  reduce using rule 37 (Do)
+
+    Do  go to state 125
+
+
+State 120
+
+   66 ReadInt: T_ReadInt '(' T_StringConstant ')' .
+
+    $default  reduce using rule 66 (ReadInt)
+
+
+State 121
+
+   43 PrintStmt: T_Print '(' T_StringConstant PrintIntArgs ')' . ';'
+
+    ';'  shift, and go to state 126
+
+
+State 122
+
+   45 PrintIntArgs: PrintIntArgs ',' . Expr
+
+    T_ReadInt      shift, and go to state 54
+    T_IntConstant  shift, and go to state 55
+    T_Identifier   shift, and go to state 56
+    '-'            shift, and go to state 57
+    '!'            shift, and go to state 58
+    '('            shift, and go to state 59
+
+    Expr      go to state 127
+    ReadInt   go to state 62
+    CallExpr  go to state 63
+
+
+State 123
+
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+   71 _Actuals: _Actuals ',' Expr .
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+
+    $default  reduce using rule 71 (_Actuals)
+
+
+State 124
+
+   29 IfStmt: If '(' Expr ')' Then . '{' Stmts '}' EndThen EndIf
+   30       | If '(' Expr ')' Then . '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
+
+    '{'  shift, and go to state 128
+
+
+State 125
+
+   35 WhileStmt: While '(' Expr ')' Do . '{' Stmts '}' EndWhile
+
+    '{'  shift, and go to state 129
+
+
+State 126
+
+   43 PrintStmt: T_Print '(' T_StringConstant PrintIntArgs ')' ';' .
+
+    $default  reduce using rule 43 (PrintStmt)
+
+
+State 127
+
+   45 PrintIntArgs: PrintIntArgs ',' Expr .
+   48 Expr: Expr . '+' Expr
+   49     | Expr . '-' Expr
+   50     | Expr . '*' Expr
+   51     | Expr . '/' Expr
+   52     | Expr . '%' Expr
+   53     | Expr . '>' Expr
+   54     | Expr . '<' Expr
+   55     | Expr . T_Ge Expr
+   56     | Expr . T_Le Expr
+   57     | Expr . T_Eq Expr
+   58     | Expr . T_Ne Expr
+   59     | Expr . T_Or Expr
+   60     | Expr . T_And Expr
+
+    T_Le   shift, and go to state 78
+    T_Ge   shift, and go to state 79
+    T_Eq   shift, and go to state 80
+    T_Ne   shift, and go to state 81
+    T_And  shift, and go to state 82
+    T_Or   shift, and go to state 83
+    '<'    shift, and go to state 84
+    '>'    shift, and go to state 85
+    '+'    shift, and go to state 86
+    '-'    shift, and go to state 87
+    '*'    shift, and go to state 88
+    '/'    shift, and go to state 89
+    '%'    shift, and go to state 90
+
+    $default  reduce using rule 45 (PrintIntArgs)
+
+
+State 128
+
+   29 IfStmt: If '(' Expr ')' Then '{' . Stmts '}' EndThen EndIf
+   30       | If '(' Expr ')' Then '{' . Stmts '}' EndThen T_Else '{' Stmts '}' EndIf
+
+    $default  reduce using rule 16 (Stmts)
+
+    Stmts  go to state 130
+
+
+State 129
+
+   35 WhileStmt: While '(' Expr ')' Do '{' . Stmts '}' EndWhile
+
+    $default  reduce using rule 16 (Stmts)
+
+    Stmts  go to state 131
+
+
+State 130
+
+   17 Stmts: Stmts . Stmt
+   29 IfStmt: If '(' Expr ')' Then '{' Stmts . '}' EndThen EndIf
+   30       | If '(' Expr ')' Then '{' Stmts . '}' EndThen T_Else '{' Stmts '}' EndIf
+
     T_While       shift, and go to state 28
     T_If          shift, and go to state 29
-    T_Break       shift, and go to state 30
-    T_Continue    shift, and go to state 31
-    T_Identifier  shift, and go to state 32
-    '}'           shift, and go to state 122
+    T_Return      shift, and go to state 30
+    T_Break       shift, and go to state 31
+    T_Continue    shift, and go to state 32
+    T_Print       shift, and go to state 33
+    T_Identifier  shift, and go to state 34
+    '}'           shift, and go to state 132
 
-    Stmt          go to state 34
-    AssignStmt    go to state 35
-    PrintStmt     go to state 36
-    CallStmt      go to state 37
-    CallExpr      go to state 38
-    ReturnStmt    go to state 39
+    Stmt          go to state 37
+    AssignStmt    go to state 38
+    CallStmt      go to state 39
     IfStmt        go to state 40
     If            go to state 41
     WhileStmt     go to state 42
     While         go to state 43
     BreakStmt     go to state 44
     ContinueStmt  go to state 45
+    ReturnStmt    go to state 46
+    PrintStmt     go to state 47
+    CallExpr      go to state 48
 
 
-State 118
+State 131
 
-   35 IfStmt: If TestExpr Then StmtsBlock EndThen . EndIf
-   36       | If TestExpr Then StmtsBlock EndThen . Else StmtsBlock EndIf
+   17 Stmts: Stmts . Stmt
+   35 WhileStmt: While '(' Expr ')' Do '{' Stmts . '}' EndWhile
 
-    T_Else  shift, and go to state 123
+    T_While       shift, and go to state 28
+    T_If          shift, and go to state 29
+    T_Return      shift, and go to state 30
+    T_Break       shift, and go to state 31
+    T_Continue    shift, and go to state 32
+    T_Print       shift, and go to state 33
+    T_Identifier  shift, and go to state 34
+    '}'           shift, and go to state 133
 
-    $default  reduce using rule 43 (EndIf)
-
-    Else   go to state 124
-    EndIf  go to state 125
-
-
-State 119
-
-   44 WhileStmt: While TestExpr Do StmtsBlock EndWhile .
-
-    $default  reduce using rule 44 (WhileStmt)
-
-
-State 120
-
-   26 PrintStmt: T_Print '(' T_StringConstant PActuals ')' ';' .
-
-    $default  reduce using rule 26 (PrintStmt)
-
-
-State 121
-
-   28 PActuals: PActuals ',' Expr .
-   50 Expr: Expr . '+' Expr
-   51     | Expr . '-' Expr
-   52     | Expr . '*' Expr
-   53     | Expr . '/' Expr
-   54     | Expr . '%' Expr
-   55     | Expr . '>' Expr
-   56     | Expr . '<' Expr
-   57     | Expr . T_Ge Expr
-   58     | Expr . T_Le Expr
-   59     | Expr . T_Eq Expr
-   60     | Expr . T_Ne Expr
-   61     | Expr . T_Or Expr
-   62     | Expr . T_And Expr
-
-    T_Le   shift, and go to state 70
-    T_Ge   shift, and go to state 71
-    T_Eq   shift, and go to state 72
-    T_Ne   shift, and go to state 73
-    T_And  shift, and go to state 74
-    T_Or   shift, and go to state 75
-    '<'    shift, and go to state 76
-    '>'    shift, and go to state 77
-    '+'    shift, and go to state 78
-    '-'    shift, and go to state 79
-    '*'    shift, and go to state 80
-    '/'    shift, and go to state 81
-    '%'    shift, and go to state 82
-
-    $default  reduce using rule 28 (PActuals)
+    Stmt          go to state 37
+    AssignStmt    go to state 38
+    CallStmt      go to state 39
+    IfStmt        go to state 40
+    If            go to state 41
+    WhileStmt     go to state 42
+    While         go to state 43
+    BreakStmt     go to state 44
+    ContinueStmt  go to state 45
+    ReturnStmt    go to state 46
+    PrintStmt     go to state 47
+    CallExpr      go to state 48
 
 
-State 122
+State 132
 
-   38 StmtsBlock: '{' Stmts '}' .
+   29 IfStmt: If '(' Expr ')' Then '{' Stmts '}' . EndThen EndIf
+   30       | If '(' Expr ')' Then '{' Stmts '}' . EndThen T_Else '{' Stmts '}' EndIf
 
-    $default  reduce using rule 38 (StmtsBlock)
+    $default  reduce using rule 33 (EndThen)
 
-
-State 123
-
-   42 Else: T_Else .
-
-    $default  reduce using rule 42 (Else)
+    EndThen  go to state 134
 
 
-State 124
+State 133
 
-   36 IfStmt: If TestExpr Then StmtsBlock EndThen Else . StmtsBlock EndIf
+   35 WhileStmt: While '(' Expr ')' Do '{' Stmts '}' . EndWhile
 
-    '{'  shift, and go to state 111
+    $default  reduce using rule 38 (EndWhile)
 
-    StmtsBlock  go to state 126
-
-
-State 125
-
-   35 IfStmt: If TestExpr Then StmtsBlock EndThen EndIf .
-
-    $default  reduce using rule 35 (IfStmt)
+    EndWhile  go to state 135
 
 
-State 126
+State 134
 
-   36 IfStmt: If TestExpr Then StmtsBlock EndThen Else StmtsBlock . EndIf
+   29 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen . EndIf
+   30       | If '(' Expr ')' Then '{' Stmts '}' EndThen . T_Else '{' Stmts '}' EndIf
 
-    $default  reduce using rule 43 (EndIf)
+    T_Else  shift, and go to state 136
 
-    EndIf  go to state 127
+    $default  reduce using rule 34 (EndIf)
+
+    EndIf  go to state 137
 
 
-State 127
+State 135
 
-   36 IfStmt: If TestExpr Then StmtsBlock EndThen Else StmtsBlock EndIf .
+   35 WhileStmt: While '(' Expr ')' Do '{' Stmts '}' EndWhile .
 
-    $default  reduce using rule 36 (IfStmt)
+    $default  reduce using rule 35 (WhileStmt)
+
+
+State 136
+
+   30 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else . '{' Stmts '}' EndIf
+
+    '{'  shift, and go to state 138
+
+
+State 137
+
+   29 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen EndIf .
+
+    $default  reduce using rule 29 (IfStmt)
+
+
+State 138
+
+   30 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' . Stmts '}' EndIf
+
+    $default  reduce using rule 16 (Stmts)
+
+    Stmts  go to state 139
+
+
+State 139
+
+   17 Stmts: Stmts . Stmt
+   30 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts . '}' EndIf
+
+    T_While       shift, and go to state 28
+    T_If          shift, and go to state 29
+    T_Return      shift, and go to state 30
+    T_Break       shift, and go to state 31
+    T_Continue    shift, and go to state 32
+    T_Print       shift, and go to state 33
+    T_Identifier  shift, and go to state 34
+    '}'           shift, and go to state 140
+
+    Stmt          go to state 37
+    AssignStmt    go to state 38
+    CallStmt      go to state 39
+    IfStmt        go to state 40
+    If            go to state 41
+    WhileStmt     go to state 42
+    While         go to state 43
+    BreakStmt     go to state 44
+    ContinueStmt  go to state 45
+    ReturnStmt    go to state 46
+    PrintStmt     go to state 47
+    CallExpr      go to state 48
+
+
+State 140
+
+   30 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' . EndIf
+
+    $default  reduce using rule 34 (EndIf)
+
+    EndIf  go to state 141
+
+
+State 141
+
+   30 IfStmt: If '(' Expr ')' Then '{' Stmts '}' EndThen T_Else '{' Stmts '}' EndIf .
+
+    $default  reduce using rule 30 (IfStmt)
